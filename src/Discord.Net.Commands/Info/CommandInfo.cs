@@ -7,9 +7,11 @@ using System.Threading.Tasks;
 using System.Reflection;
 
 using Discord.Commands.Builders;
+using System.Diagnostics;
 
 namespace Discord.Commands
 {
+    [DebuggerDisplay("{Name,nq}")]
     public class CommandInfo
     {
         private static readonly System.Reflection.MethodInfo _convertParamsMethod = typeof(CommandInfo).GetTypeInfo().GetDeclaredMethod(nameof(ConvertParamsList));
@@ -41,9 +43,9 @@ namespace Discord.Commands
             Priority = builder.Priority;
             
             if (module.Aliases.Count != 0)
-                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => first + " " + second).ToImmutableArray();
+                Aliases = module.Aliases.Permutate(builder.Aliases, (first, second) => first + " " + second).Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
             else
-                Aliases = builder.Aliases.ToImmutableArray();
+                Aliases = builder.Aliases.Select(x => service._caseSensitive ? x : x.ToLowerInvariant()).ToImmutableArray();
 
             Preconditions = builder.Preconditions.ToImmutableArray();
 
